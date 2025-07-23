@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'https://nuke-brand-d2ea8b9b3c96.herokuapp.com/api'
+  baseURL: '/api'
 });
 
 export default api; 

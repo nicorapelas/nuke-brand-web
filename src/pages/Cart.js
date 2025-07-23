@@ -120,7 +120,11 @@ const CheckoutBtn = styled.button`
 const EmptyCart = styled.div`
   text-align: center;
   padding: 60px 20px;
-  color: #7f8c8d;
+  color: #fecb00;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  margin: 20px 0;
 `;
 
 const CartContainer = styled.div`
