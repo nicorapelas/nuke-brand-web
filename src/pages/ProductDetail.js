@@ -135,10 +135,15 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        console.log(`[ProductDetail] Attempting to fetch product with handle: ${handle}`);
         const response = await api.get(`/products/${handle}`);
+        console.log(`[ProductDetail] API response for /products/${handle}:`, response.data);
         setProduct(response.data);
       } catch (error) {
-        // Silently handle product fetch errors
+        console.error(`[ProductDetail] Error fetching product with handle '${handle}':`, error);
+        console.error(`[ProductDetail] Error response:`, error.response);
+        console.error(`[ProductDetail] Error status:`, error.response?.status);
+        console.error(`[ProductDetail] Error data:`, error.response?.data);
       } finally {
         setLoading(false);
       }
@@ -146,6 +151,12 @@ const ProductDetail = () => {
 
     fetchProduct();
   }, [handle]);
+
+  useEffect(() => {
+    console.log(`[ProductDetail] Product state updated:`, product);
+    console.log(`[ProductDetail] Product type:`, typeof product);
+    console.log(`[ProductDetail] Product is null:`, product === null);
+  }, [product]);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
