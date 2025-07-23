@@ -99,10 +99,13 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        console.log('[Home] Attempting to fetch products from /products API endpoint');
         const response = await api.get('/products')
-        setProducts(response.data)
+        console.log('[Home] API /products response:', response.data)
+        setProducts(Array.isArray(response.data) ? response.data : [])
       } catch (error) {
         // Silently handle product fetch errors
+        console.error('[Home] Error fetching products:', error)
       } finally {
         setLoading(false)
       }
@@ -111,8 +114,15 @@ const Home = () => {
     fetchProducts()
   }, [])
 
+  useEffect(() => {
+    console.log('[Home] products state updated:', products, 'Type:', typeof products, 'IsArray:', Array.isArray(products))
+  }, [products])
+
   const getProductByHandle = (handle) => {
-    return products.find(product => product.handle === handle);
+    const arr = Array.isArray(products) ? products : [];
+    const found = arr.find(product => product.handle === handle);
+    console.log(`[Home] getProductByHandle('${handle}') called. Found:`, found);
+    return found;
   };
 
   const ng101Product = getProductByHandle('digital-watch');
