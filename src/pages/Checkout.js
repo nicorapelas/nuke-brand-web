@@ -188,22 +188,6 @@ const ErrorMessage = styled.div`
   border: 1px solid #f44336;
 `
 
-const AutoFillBtn = styled.button`
-  background: #3498db;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 15px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: #2980b9;
-  }
-`
-
 const Checkout = () => {
   const navigate = useNavigate()
   const { items, getCartTotal, clearCart } = useCart()
@@ -224,19 +208,6 @@ const Checkout = () => {
     setCustomerInfo({
       ...customerInfo,
       [e.target.name]: e.target.value
-    })
-  }
-
-  const handleAutoFill = () => {
-    setCustomerInfo({
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      phone: '0821234567',
-      address: '123 Test Street, Test Suburb',
-      city: 'Johannesburg',
-      province: 'Gauteng',
-      postalCode: '2000'
     })
   }
 
@@ -337,12 +308,7 @@ const Checkout = () => {
           
           <CheckoutContent>
             <CustomerForm onSubmit={handleSubmit}>
-              {error && <ErrorMessage>{error}</ErrorMessage>}
-              
-              <AutoFillBtn type="button" onClick={handleAutoFill}>
-                🧪 Auto-fill Test Data (Debug)
-              </AutoFillBtn>
-              
+              {error && <ErrorMessage>{error}</ErrorMessage>}              
               <FormGroup>
                 <Label htmlFor="firstName">First Name *</Label>
                 <Input
