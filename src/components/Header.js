@@ -36,6 +36,7 @@ const HeaderContent = styled.div`
     flex-direction: column;
     padding-top: 10px;
     padding-bottom: 10px;
+    gap: 15px;
   }
 `;
 
@@ -304,10 +305,6 @@ const Header = () => {
             </CartLink>
           </NavGroup>
         </Nav>
-        
-        <MobileMenuButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          ☰
-        </MobileMenuButton>
       </HeaderContent>
       
       <MobileMenu isOpen={mobileMenuOpen}>
