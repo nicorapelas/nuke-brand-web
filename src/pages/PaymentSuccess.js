@@ -139,9 +139,19 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const fetchOrderStatus = async () => {
       try {
-        const orderId = searchParams.get('m_payment_id')
+        // Debug: Log all search parameters
+        console.log('=== PAYMENT SUCCESS DEBUG ===')
+        console.log('All search params:', Object.fromEntries(searchParams.entries()))
+        console.log('m_payment_id:', searchParams.get('m_payment_id'))
+        console.log('pf_payment_id:', searchParams.get('pf_payment_id'))
+        console.log('payment_status:', searchParams.get('payment_status'))
+        console.log('================================')
+        
+        const orderId = searchParams.get('m_payment_id') || searchParams.get('pf_payment_id')
         if (orderId) {
+          console.log('Fetching order status for ID:', orderId)
           const response = await api.get(`/payments/status/${orderId}`)
+          console.log('Order status response:', response.data)
           if (response.data.success) {
             setOrder(response.data.order)
           } else {
@@ -151,6 +161,7 @@ const PaymentSuccess = () => {
           setError('No order ID provided')
         }
       } catch (error) {
+        console.error('Error fetching order status:', error)
         setError('Failed to fetch order details')
       } finally {
         setLoading(false)
