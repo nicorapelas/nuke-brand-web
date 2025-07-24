@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { useCart } from '../context/CartContext';
@@ -14,6 +14,11 @@ const ShippingBanner = styled.div`
   text-align: center;
   padding: 8px;
   font-size: 14px;
+  
+  @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 6px;
+  }
 `;
 
 const HeaderContent = styled.div`
@@ -24,6 +29,11 @@ const HeaderContent = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 80px;
+  
+  @media (max-width: 768px) {
+    padding: 0 15px;
+    height: 70px;
+  }
 `;
 
 const Logo = styled(Link)`
@@ -32,16 +42,28 @@ const Logo = styled(Link)`
   display: flex;
   align-items: center;
   gap: 10px;
+  
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
 `;
 
 const LogoImg = styled.img`
   height: 40px;
   width: auto;
+  
+  @media (max-width: 768px) {
+    height: 32px;
+  }
 `;
 
 const LogoText = styled.div`
   display: flex;
   flex-direction: column;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Since = styled.span`
@@ -53,12 +75,20 @@ const Nav = styled.nav`
   display: flex;
   align-items: center;
   gap: 30px;
+  
+  @media (max-width: 768px) {
+    gap: 15px;
+  }
 `;
 
 const NavGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  
+  @media (max-width: 768px) {
+    gap: 10px;
+  }
 `;
 
 const NavLink = styled(Link)`
@@ -69,6 +99,10 @@ const NavLink = styled(Link)`
   
   &:hover {
     color: #fff;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 14px;
   }
 `;
 
@@ -103,6 +137,12 @@ const BulkSign = styled.button`
     animation: none;
     box-shadow: 0 0 15px rgba(254, 203, 0, 0.8), 0 0 30px rgba(254, 203, 0, 0.6), 0 0 45px rgba(254, 203, 0, 0.4);
   }
+  
+  @media (max-width: 768px) {
+    font-size: 10px;
+    padding: 3px 6px;
+    display: none;
+  }
 `;
 
 const CartLink = styled(Link)`
@@ -117,6 +157,11 @@ const CartLink = styled(Link)`
 const CartIcon = styled.svg`
   width: 20px;
   height: 20px;
+  
+  @media (max-width: 768px) {
+    width: 18px;
+    height: 18px;
+  }
 `;
 
 const CartCount = styled.span`
@@ -133,6 +178,78 @@ const CartCount = styled.span`
   justify-content: center;
   font-size: 10px;
   font-weight: bold;
+  
+  @media (max-width: 768px) {
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+    top: -6px;
+    right: -6px;
+  }
+`;
+
+const MobileMenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  color: #fecb00;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
+const MobileMenu = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: ${props => props.isOpen ? 'flex' : 'none'};
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #000;
+    border-top: 1px solid #333;
+    padding: 20px;
+    gap: 15px;
+    z-index: 1000;
+  }
+`;
+
+const MobileNavLink = styled(Link)`
+  text-decoration: none;
+  color: #fecb00;
+  font-weight: 500;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    color: #fff;
+  }
+`;
+
+const MobileBulkSign = styled.button`
+  background: #fecb00;
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  
+  &:hover {
+    background: #e6b800;
+  }
 `;
 
 const Header = () => {
@@ -140,11 +257,13 @@ const Header = () => {
   const cartCount = getCartCount();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const currentMonth = new Date().toLocaleString('default', { month: 'long' });
 
   const handleBulkSpecialsClick = () => {
     navigate('/contact');
+    setMobileMenuOpen(false);
   };
 
   const isHomePage = location.pathname === '/';
@@ -182,7 +301,20 @@ const Header = () => {
             </CartLink>
           </NavGroup>
         </Nav>
+        
+        <MobileMenuButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          ☰
+        </MobileMenuButton>
       </HeaderContent>
+      
+      <MobileMenu isOpen={mobileMenuOpen}>
+        {!isHomePage && <MobileNavLink to="/" onClick={() => setMobileMenuOpen(false)}>Shop Now</MobileNavLink>}
+        <MobileNavLink to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact Us</MobileNavLink>
+        <MobileNavLink to="/about" onClick={() => setMobileMenuOpen(false)}>About Us</MobileNavLink>
+        <MobileBulkSign onClick={handleBulkSpecialsClick}>
+          Bulk Specials Available
+        </MobileBulkSign>
+      </MobileMenu>
     </HeaderContainer>
   );
 };
