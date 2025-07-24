@@ -145,25 +145,55 @@ const PaymentSuccess = () => {
         console.log('m_payment_id:', searchParams.get('m_payment_id'))
         console.log('pf_payment_id:', searchParams.get('pf_payment_id'))
         console.log('payment_status:', searchParams.get('payment_status'))
+        console.log('URL pathname:', window.location.pathname)
+        console.log('Full URL:', window.location.href)
         console.log('================================')
         
         const orderId = searchParams.get('m_payment_id') || searchParams.get('pf_payment_id')
+        console.log('Extracted order ID:', orderId)
+        
         if (orderId) {
           console.log('Fetching order status for ID:', orderId)
           const response = await api.get(`/payments/status/${orderId}`)
           console.log('Order status response:', response.data)
           if (response.data.success) {
+            console.log('Order found successfully:', response.data.order)
             setOrder(response.data.order)
           } else {
+            console.log('Order not found in database')
             setError('Order not found')
           }
         } else {
-          setError('No order ID provided')
+          console.log('No order ID in URL parameters')
+          // Try to get email from localStorage (set during checkout)
+          const lastCheckoutEmail = localStorage.getItem('lastCheckoutEmail')
+          console.log('Email from localStorage:', lastCheckoutEmail)
+          
+          if (lastCheckoutEmail) {
+            console.log('No order ID, trying to fetch latest paid order for email:', lastCheckoutEmail)
+            const response = await api.get(`/payments/latest-paid-order?email=${encodeURIComponent(lastCheckoutEmail)}`)
+            console.log('Latest paid order response:', response.data)
+            
+            if (response.data.success) {
+              console.log('Latest paid order found:', response.data.order)
+              setOrder(response.data.order)
+            } else {
+              console.log('No recent paid order found for email')
+              setError('No recent paid order found for your email. If you believe this is an error, please contact support.')
+            }
+          } else {
+            console.log('No email found in localStorage')
+            setError('No order ID or email found. If you believe this is an error, please contact support.')
+          }
         }
       } catch (error) {
         console.error('Error fetching order status:', error)
+        console.error('Error response:', error.response)
+        console.error('Error status:', error.response?.status)
+        console.error('Error data:', error.response?.data)
         setError('Failed to fetch order details')
       } finally {
+        console.log('Setting loading to false')
         setLoading(false)
       }
     }
