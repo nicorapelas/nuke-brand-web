@@ -32,7 +32,10 @@ const HeaderContent = styled.div`
   
   @media (max-width: 768px) {
     padding: 0 15px;
-    height: 70px;
+    height: auto;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 `;
 
