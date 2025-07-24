@@ -216,6 +216,14 @@ const Checkout = () => {
     setLoading(true)
     setError('')
 
+    // Store checkout email in localStorage for use on the success page
+    if (customerInfo.email) {
+      localStorage.setItem('lastCheckoutEmail', customerInfo.email)
+      console.log('[Checkout] Stored lastCheckoutEmail in localStorage:', customerInfo.email)
+    } else {
+      console.warn('[Checkout] No email found in customerInfo, not storing in localStorage')
+    }
+
     try {
       const requestData = {
         customerInfo,
