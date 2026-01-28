@@ -22,7 +22,7 @@ const CheckoutContainer = styled.div`
   padding: 30px;
   border-radius: 15px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   color: #fecb00;
 `
 
@@ -37,7 +37,7 @@ const CheckoutContent = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -68,13 +68,13 @@ const Input = styled.input`
   font-size: 16px;
   background: rgba(0, 0, 0, 0.3);
   color: #fecb00;
-  
+
   &:focus {
     outline: none;
     border-color: #fecb00;
     box-shadow: 0 0 5px rgba(254, 203, 0, 0.3);
   }
-  
+
   &::placeholder {
     color: rgba(254, 203, 0, 0.6);
   }
@@ -99,7 +99,7 @@ const OrderItem = styled.div`
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid rgba(254, 203, 0, 0.2);
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -165,13 +165,13 @@ const PayFastBtn = styled.button`
   width: 100%;
   margin-top: 20px;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #e6b800;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(254, 203, 0, 0.4);
   }
-  
+
   &:disabled {
     background: rgba(254, 203, 0, 0.5);
     cursor: not-allowed;
@@ -190,7 +190,7 @@ const ErrorMessage = styled.div`
 
 const Checkout = () => {
   const navigate = useNavigate()
-  const { items, getCartTotal, clearCart } = useCart()
+  const { items, getCartTotal } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [customerInfo, setCustomerInfo] = useState({
@@ -201,17 +201,17 @@ const Checkout = () => {
     address: '',
     city: '',
     province: '',
-    postalCode: ''
+    postalCode: '',
   })
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     setCustomerInfo({
       ...customerInfo,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -219,37 +219,18 @@ const Checkout = () => {
     // Store checkout email in localStorage for use on the success page
     if (customerInfo.email) {
       localStorage.setItem('lastCheckoutEmail', customerInfo.email)
-      console.log('[Checkout] Stored lastCheckoutEmail in localStorage:', customerInfo.email)
-    } else {
-      console.warn('[Checkout] No email found in customerInfo, not storing in localStorage')
     }
 
     try {
       const requestData = {
         customerInfo,
         items,
-        total: getCartTotal()
+        total: getCartTotal(),
       }
-
-      // Enhanced debug logging
-      console.log('=== ENHANCED FRONTEND DEBUG ===')
-      console.log('Request Data:', JSON.stringify(requestData, null, 2))
-      console.log('Items:', JSON.stringify(items, null, 2))
-      console.log('Customer Info:', JSON.stringify(customerInfo, null, 2))
-      console.log('Total:', getCartTotal())
-      console.log('================================')
 
       const response = await api.post('/payments/initiate', requestData)
 
       if (response.data.success) {
-        // Enhanced debug logging
-        console.log('=== ENHANCED PAYFAST RESPONSE ===')
-        console.log('Response:', JSON.stringify(response.data, null, 2))
-        console.log('Payment Data:', JSON.stringify(response.data.paymentData, null, 2))
-        console.log('Redirect URL:', response.data.redirectUrl)
-        console.log('All payment data keys:', Object.keys(response.data.paymentData))
-        console.log('==================================')
-
         // Create a form to submit to PayFast
         const form = document.createElement('form')
         form.method = 'POST'
@@ -257,9 +238,19 @@ const Checkout = () => {
 
         // Add all payment data as hidden fields (only required PayFast fields)
         const requiredKeys = [
-          'merchant_id', 'merchant_key', 'return_url', 'cancel_url', 'notify_url',
-          'm_payment_id', 'amount', 'item_name', 'name_first', 'name_last', 'email_address', 'signature'
-        ];
+          'merchant_id',
+          'merchant_key',
+          'return_url',
+          'cancel_url',
+          'notify_url',
+          'm_payment_id',
+          'amount',
+          'item_name',
+          'name_first',
+          'name_last',
+          'email_address',
+          'signature',
+        ]
         Object.keys(response.data.paymentData).forEach(key => {
           if (requiredKeys.includes(key)) {
             const input = document.createElement('input')
@@ -270,18 +261,6 @@ const Checkout = () => {
           }
         })
 
-        // Enhanced form debugging
-        console.log('=== ENHANCED FORM DEBUG ===')
-        console.log('Form action:', form.action)
-        console.log('Form method:', form.method)
-        console.log('Form fields:', Array.from(form.elements).map(el => ({ 
-          name: el.name, 
-          value: el.value,
-          type: el.type 
-        })))
-        console.log('Form HTML:', form.outerHTML)
-        console.log('==========================')
-
         // Submit the form to redirect to PayFast
         document.body.appendChild(form)
         form.submit()
@@ -289,14 +268,10 @@ const Checkout = () => {
         setError('Failed to initiate payment. Please try again.')
       }
     } catch (error) {
-      console.error('=== CHECKOUT ERROR ===')
-      console.error('Error object:', error)
-      console.error('Error response:', error.response)
-      console.error('Error message:', error.message)
-      console.error('Error status:', error.response?.status)
-      console.error('Error data:', error.response?.data)
-      console.error('=====================')
-      setError(error.response?.data?.error || 'Failed to initiate payment. Please try again.')
+      setError(
+        error.response?.data?.error ||
+          'Failed to initiate payment. Please try again.'
+      )
     } finally {
       setLoading(false)
     }
@@ -313,10 +288,10 @@ const Checkout = () => {
       <CheckoutPage>
         <CheckoutContainer>
           <CheckoutTitle>Checkout</CheckoutTitle>
-          
+
           <CheckoutContent>
             <CustomerForm onSubmit={handleSubmit}>
-              {error && <ErrorMessage>{error}</ErrorMessage>}              
+              {error && <ErrorMessage>{error}</ErrorMessage>}
               <FormGroup>
                 <Label htmlFor="firstName">First Name *</Label>
                 <Input
@@ -329,7 +304,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="lastName">Last Name *</Label>
                 <Input
@@ -342,7 +317,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="email">Email *</Label>
                 <Input
@@ -355,7 +330,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="phone">Phone Number *</Label>
                 <Input
@@ -368,7 +343,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="address">Delivery Address *</Label>
                 <Input
@@ -382,7 +357,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="city">City *</Label>
                 <Input
@@ -395,7 +370,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="province">Province *</Label>
                 <Input
@@ -409,7 +384,7 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label htmlFor="postalCode">Postal Code *</Label>
                 <Input
@@ -422,16 +397,16 @@ const Checkout = () => {
                   disabled={loading}
                 />
               </FormGroup>
-              
+
               <PayFastBtn type="submit" disabled={loading}>
                 {loading ? 'Processing...' : 'Pay with PayFast'}
               </PayFastBtn>
             </CustomerForm>
-            
+
             <OrderSummary>
               <OrderTitle>Order Summary</OrderTitle>
-              
-              {items.map((item) => (
+
+              {items.map(item => (
                 <OrderItem key={item.id}>
                   <ItemInfo>
                     <ItemImage src={item.image} alt={item.title} />
@@ -444,7 +419,7 @@ const Checkout = () => {
                   <span>R{(item.price * item.quantity).toFixed(2)}</span>
                 </OrderItem>
               ))}
-              
+
               <TotalSection>
                 <TotalRow>
                   <span>Total:</span>
@@ -459,4 +434,4 @@ const Checkout = () => {
   )
 }
 
-export default Checkout 
+export default Checkout

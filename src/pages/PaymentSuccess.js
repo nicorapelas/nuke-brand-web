@@ -24,7 +24,7 @@ const SuccessContainer = styled.div`
   padding: 40px;
   border-radius: 15px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   color: #fecb00;
   text-align: center;
   max-width: 500px;
@@ -68,7 +68,7 @@ const OrderDetail = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -122,7 +122,7 @@ const ActionBtn = styled(Link)`
   border-radius: 5px;
   font-weight: bold;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #e6b800;
     transform: translateY(-2px);
@@ -139,61 +139,43 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const fetchOrderStatus = async () => {
       try {
-        // Debug: Log all search parameters
-        console.log('=== PAYMENT SUCCESS DEBUG ===')
-        console.log('All search params:', Object.fromEntries(searchParams.entries()))
-        console.log('m_payment_id:', searchParams.get('m_payment_id'))
-        console.log('pf_payment_id:', searchParams.get('pf_payment_id'))
-        console.log('payment_status:', searchParams.get('payment_status'))
-        console.log('URL pathname:', window.location.pathname)
-        console.log('Full URL:', window.location.href)
-        console.log('================================')
-        
-        const orderId = searchParams.get('m_payment_id') || searchParams.get('pf_payment_id')
-        console.log('Extracted order ID:', orderId)
-        
+        const orderId =
+          searchParams.get('m_payment_id') || searchParams.get('pf_payment_id')
+
         if (orderId) {
-          console.log('Fetching order status for ID:', orderId)
           const response = await api.get(`/payments/status/${orderId}`)
-          console.log('Order status response:', response.data)
           if (response.data.success) {
-            console.log('Order found successfully:', response.data.order)
             setOrder(response.data.order)
           } else {
-            console.log('Order not found in database')
             setError('Order not found')
           }
         } else {
-          console.log('No order ID in URL parameters')
           // Try to get email from localStorage (set during checkout)
           const lastCheckoutEmail = localStorage.getItem('lastCheckoutEmail')
-          console.log('Email from localStorage:', lastCheckoutEmail)
-          
+
           if (lastCheckoutEmail) {
-            console.log('No order ID, trying to fetch latest paid order for email:', lastCheckoutEmail)
-            const response = await api.get(`/payments/latest-paid-order?email=${encodeURIComponent(lastCheckoutEmail)}`)
-            console.log('Latest paid order response:', response.data)
-            
+            const response = await api.get(
+              `/payments/latest-paid-order?email=${encodeURIComponent(
+                lastCheckoutEmail
+              )}`
+            )
+
             if (response.data.success) {
-              console.log('Latest paid order found:', response.data.order)
               setOrder(response.data.order)
             } else {
-              console.log('No recent paid order found for email')
-              setError('No recent paid order found for your email. If you believe this is an error, please contact support.')
+              setError(
+                'No recent paid order found for your email. If you believe this is an error, please contact support.'
+              )
             }
           } else {
-            console.log('No email found in localStorage')
-            setError('No order ID or email found. If you believe this is an error, please contact support.')
+            setError(
+              'No order ID or email found. If you believe this is an error, please contact support.'
+            )
           }
         }
       } catch (error) {
-        console.error('Error fetching order status:', error)
-        console.error('Error response:', error.response)
-        console.error('Error status:', error.response?.status)
-        console.error('Error data:', error.response?.data)
         setError('Failed to fetch order details')
       } finally {
-        console.log('Setting loading to false')
         setLoading(false)
       }
     }
@@ -231,10 +213,10 @@ const PaymentSuccess = () => {
         <SuccessIcon>✓</SuccessIcon>
         <SuccessTitle>Payment Successful!</SuccessTitle>
         <SuccessMessage>
-          Thank you for your order! Your payment has been processed successfully. 
-          You will receive a confirmation email shortly.
+          Thank you for your order! Your payment has been processed
+          successfully. You will receive a confirmation email shortly.
         </SuccessMessage>
-        
+
         {order && (
           <>
             <OrderDetails>
@@ -257,17 +239,21 @@ const PaymentSuccess = () => {
                 </DetailValue>
               </OrderDetail>
             </OrderDetails>
-            
+
             {order.customerInfo && (
               <DeliverySection>
                 <DeliveryTitle>Delivery Information</DeliveryTitle>
                 <DeliveryInfo>
                   <DeliveryLine>
-                    <strong>{order.customerInfo.firstName} {order.customerInfo.lastName}</strong>
+                    <strong>
+                      {order.customerInfo.firstName}{' '}
+                      {order.customerInfo.lastName}
+                    </strong>
                   </DeliveryLine>
                   <DeliveryLine>{order.customerInfo.address}</DeliveryLine>
                   <DeliveryLine>
-                    {order.customerInfo.city}, {order.customerInfo.province} {order.customerInfo.postalCode}
+                    {order.customerInfo.city}, {order.customerInfo.province}{' '}
+                    {order.customerInfo.postalCode}
                   </DeliveryLine>
                   <DeliveryLine>Phone: {order.customerInfo.phone}</DeliveryLine>
                   <DeliveryLine>Email: {order.customerInfo.email}</DeliveryLine>
@@ -276,7 +262,7 @@ const PaymentSuccess = () => {
             )}
           </>
         )}
-        
+
         <ActionButtons>
           <ActionBtn to="/">Continue Shopping</ActionBtn>
           <ActionBtn to="/contact">Contact Support</ActionBtn>
@@ -286,4 +272,4 @@ const PaymentSuccess = () => {
   )
 }
 
-export default PaymentSuccess 
+export default PaymentSuccess
