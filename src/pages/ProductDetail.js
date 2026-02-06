@@ -93,11 +93,28 @@ const BuyNowBtn = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: #e6b800;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(254, 203, 0, 0.4);
   }
+
+  &:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+  }
+`
+
+const SoldOutBadge = styled.span`
+  display: inline-block;
+  background: #c62828;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
 `
 
 const SpecsList = styled.ul`
@@ -149,6 +166,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = async e => {
     e.preventDefault()
+    if (product.soldOut) return
     try {
       await addToCart(product.id, 1)
       alert('Item added to cart successfully!')
@@ -168,6 +186,8 @@ const ProductDetail = () => {
 
   if (!product) return <div>Product not found</div>
 
+  const isSoldOut = product.soldOut === true || product.handle === 'nuke-cgsr001-digital-watch'
+
   return (
     <>
       <LoadingModal isVisible={loading} message="Loading product..." />
@@ -182,9 +202,12 @@ const ProductDetail = () => {
           <ProductDetails>
             <ProductTitle>{product.title}</ProductTitle>
             <Price>R{product.price}</Price>
+            {isSoldOut && <SoldOutBadge>Sold out</SoldOutBadge>}
 
             <form onSubmit={handleAddToCart}>
-              <BuyNowBtn type="submit">Add to Cart</BuyNowBtn>
+              <BuyNowBtn type="submit" disabled={isSoldOut}>
+                {isSoldOut ? 'Sold out' : 'Add to Cart'}
+              </BuyNowBtn>
             </form>
 
             <div>
